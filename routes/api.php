@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Events\Message;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,4 +17,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::get("send", function (Request $request) {
+    // broadcast(new Message())->toOthers();
+    Message::broadcast();
+    return response("OK");
+});
+
+Route::post('/websocket/auth', function (Request $request) {
+    $pusher = new Pusher\Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'));
+    return $pusher->authorizeChannel($request->request->get('channel_name'), $request->request->get('socket_id'));
 });
